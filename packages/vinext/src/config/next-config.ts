@@ -139,6 +139,8 @@ export interface ResolvedNextConfig {
   mdx: MdxOptions | null;
   /** Extra allowed origins for server action CSRF validation (from experimental.serverActions.allowedOrigins). */
   serverActionsAllowedOrigins: string[];
+  /** Packages whose barrel imports should be optimized (from experimental.optimizePackageImports). */
+  optimizePackageImports: string[];
 }
 
 const CONFIG_FILES = [
@@ -246,6 +248,7 @@ export async function resolveNextConfig(
       i18n: null,
       mdx: null,
       serverActionsAllowedOrigins: [],
+      optimizePackageImports: [],
     };
   }
 
@@ -287,6 +290,11 @@ export async function resolveNextConfig(
     ? (serverActionsConfig.allowedOrigins as string[])
     : [];
 
+  // Resolve optimizePackageImports from experimental config
+  const optimizePackageImports = Array.isArray(experimental?.optimizePackageImports)
+    ? (experimental.optimizePackageImports as string[])
+    : [];
+
   // Warn about unsupported options (skip webpack if we extracted MDX from it)
   const unsupported = mdx ? [] : ["webpack"];
   for (const key of unsupported) {
@@ -326,6 +334,7 @@ export async function resolveNextConfig(
     i18n,
     mdx,
     serverActionsAllowedOrigins,
+    optimizePackageImports,
   };
 }
 
