@@ -1,4 +1,4 @@
-import type { Plugin, ViteDevServer } from "vite";
+import type { Plugin, UserConfig, ViteDevServer } from "vite";
 import { parseAst } from "vite";
 import { pagesRouter, apiRouter, invalidateRouteCache, matchRoute, patternToNextFormat as pagesPatternToNextFormat, type Route } from "./routing/pages-router.js";
 import { appRouter, invalidateAppRouteCache } from "./routing/app-router.js";
@@ -1845,7 +1845,7 @@ hydrate();
         // environments where it can cause asset resolution issues.
         const isMultiEnv = hasAppDir || hasCloudflarePlugin;
 
-        const viteConfig: Record<string, any> = {
+        const viteConfig: UserConfig = {
           // Disable Vite's default HTML serving - we handle all routing
           appType: "custom",
           build: {
@@ -1858,7 +1858,7 @@ hydrate();
               // warning handling is not lost.
               onwarn: (() => {
                 const userOnwarn = config.build?.rollupOptions?.onwarn;
-                return (warning: any, defaultHandler: any) => {
+                return (warning, defaultHandler) => {
                   if (
                     warning.code === "MODULE_LEVEL_DIRECTIVE" &&
                     (warning.message?.includes('"use client"') ||
@@ -2262,7 +2262,7 @@ hydrate();
 
         // Return a function to register middleware AFTER Vite's built-in middleware
         return () => {
-          server.middlewares.use(async (req: any, res: any, next: any) => {
+          server.middlewares.use(async (req, res, next) => {
             try {
               let url: string = req.url ?? "/";
 
@@ -3026,7 +3026,7 @@ hydrate();
         sequential: true,
         order: "post",
         async handler(options) {
-          const envName = (this as any).environment?.name as string | undefined;
+          const envName = this.environment?.name;
           if (envName !== "rsc") return;
 
           const outDir = options.dir;
@@ -3083,11 +3083,11 @@ hydrate();
         sequential: true,
         order: "post",
         async handler() {
-          const envName = (this as any).environment?.name as string | undefined;
+          const envName = this.environment?.name
           if (!envName || !hasCloudflarePlugin) return;
           if (envName !== "client") return;
 
-          const envConfig = (this as any).environment?.config;
+          const envConfig = this.environment?.config;
           if (!envConfig) return;
           const buildRoot = envConfig.root ?? process.cwd();
           const distDir = path.resolve(buildRoot, "dist");
